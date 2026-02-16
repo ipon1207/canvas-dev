@@ -1,0 +1,6 @@
+# すべてのテキストファイルをLF（Linux形式）で管理する
+* text=auto eol=lf
+
+# WindowsバッチファイルだけはCRLFを許可する
+*.cmd text eol=crlf
+*.bat text eol=crlf
