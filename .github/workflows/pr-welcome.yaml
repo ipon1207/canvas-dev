@@ -1,0 +1,91 @@
+name: PR Welcome Comment
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome Comment on New PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const prNumber = pr.number;
+            const title = pr.title;
+            const body = pr.body || '';
+            
+            // PRタイトルの分析
+            const hasConventionalCommit = /^(feat|fix|docs|style|refactor|perf|test|chore|build|ci):/i.test(title);
+            
+            // Issue番号の確認
+            const hasIssueReference = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\d+/i.test(body);
+            
+            // PRサイズの確認
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const totalChanges = additions + deletions;
+            
+            let sizeEmoji = '✨';
+            let sizeComment = '';
+            
+            if (totalChanges < 50) {
+              sizeEmoji = '🎯';
+              sizeComment = 'とても小さなPRですね！レビューしやすいサイズです。';
+            } else if (totalChanges < 200) {
+              sizeEmoji = '👍';
+              sizeComment = '適切なサイズのPRですね。';
+            } else if (totalChanges < 500) {
+              sizeEmoji = '📦';
+              sizeComment = 'やや大きめのPRです。必要に応じて分割も検討してください。';
+            } else {
+              sizeEmoji = '⚠️';
+              sizeComment = 'かなり大きなPRです。レビューの負荷を考慮し、可能であれば分割をお勧めします。';
+            }
+            
+            // フィードバックメッセージの生成
+            let tips = [];
+            
+            if (!hasConventionalCommit) {
+              tips.push('💡 **Tip**: PRタイトルは `feat:`, `fix:`, `docs:` などで始めると、変更内容が明確になります。');
+            }
+            
+            if (!hasIssueReference) {
+              tips.push('⚠️ **Important**: PR本文に `Closes #XX` を記載して、Issueと紐付けてください（IDD Guardでチェックされます）。');
+            }
+            
+            if (totalChanges > 500) {
+              tips.push('📋 **Suggestion**: 大きなPRの場合、「レビューポイント」セクションで特に見てほしい箇所を明示すると、レビューがスムーズになります。');
+            }
+            
+            // 歓迎メッセージ
+            let message = `## ${sizeEmoji} PRを作成いただきありがとうございます！\n\n`;
+            message += `@${author} さん、Pull Request #${prNumber} の作成ありがとうございます 🎉\n\n`;
+            message += `### 📊 PR情報\n`;
+            message += `- **変更行数**: +${additions} / -${deletions} (合計: ${totalChanges}行)\n`;
+            message += `- ${sizeComment}\n\n`;
+            if (tips.length > 0) {
+              message += `### 💬 フィードバック\n` + tips.join('\n\n') + '\n\n';
+            }
+            if (hasConventionalCommit && hasIssueReference) {
+              message += `### ✅ 素晴らしい！\n\nタイトル形式もIssue紐付けも完璧です。CI チェックが完了したらレビューを依頼してください。\n\n`;
+            }
+            message += `---\n\n`;
+            message += `📚 **参考資料**:\n`;
+            message += `- [良いPRの例](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/.github/TEMPLATE_DOCS/examples/good-pull-request.md)\n`;
+            message += `- [コードレビューガイド](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/.github/TEMPLATE_DOCS/code-review-guide.md)\n`;
+            message += `- [FAQ](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/.github/TEMPLATE_DOCS/faq.md)\n\n`;
+            message += `レビュー後、何か質問があればお気軽にコメントしてください！`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: message
+            });

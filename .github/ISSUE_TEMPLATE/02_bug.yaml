@@ -1,0 +1,59 @@
+name: 🐛 バグ報告 (Bug Report)
+description: 発生している不具合やエラーを報告します
+title: "[Bug]: "
+labels: ["Type: Bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        不具合の報告ありがとうございます！
+        可能な限り詳細に記述いただけると、修正がスムーズになります。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 不具合の概要
+      description: 何が起きているか簡潔に説明してください。
+      placeholder: 例：ログインボタンをクリックしても反応がなく、コンソールにエラーが出る。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: バグを再現するための手順を具体的なステップで記述してください。
+      placeholder: |
+        1. '...' ページにアクセスする
+        2. '...' に 'xxxx' と入力する
+        3. '...' ボタンをクリックする
+        4. エラーが表示される
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待される動作
+      description: 本来どうなるべきだったかを記述してください。
+      placeholder: エラーにならず、ダッシュボード画面に遷移するはず。
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ / スクリーンショット
+      description: エラーログのコピペや、画面のスクリーンショットがあればここに貼ってください。
+      render: shell
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 重要度 / 優先度
+      options:
+        - 🔴 Critical (進行不能・データ破損など致命的)
+        - 🟡 Major (主要機能に影響がある)
+        - 🟢 Minor (軽微・回避策がある・見た目のみ)
+    validations:
+      required: true

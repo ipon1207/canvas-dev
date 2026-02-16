@@ -1,0 +1,11 @@
+name: ⚡ クイックタスク (Task)
+description: 細かいタスクやメモを素早く記録します
+title: "[Task]: "
+labels: ["Type: Task"]
+body:
+  - type: textarea
+    attributes:
+      label: やること
+      placeholder: ここにやることを1行で書く
+    validations:
+      required: true

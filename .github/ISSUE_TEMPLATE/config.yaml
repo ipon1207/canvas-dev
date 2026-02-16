@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 質問・ディスカッション
+    url: ../../discussions
+    about: 実装を伴わない質問はこちらへ

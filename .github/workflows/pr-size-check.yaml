@@ -1,0 +1,86 @@
+name: PR Size Checker
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  check-size:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const totalChanges = additions + deletions;
+            const filesChanged = pr.changed_files;
+            
+            let status = 'success';
+            let label = '';
+            let message = '';
+            
+            // サイズによる分類
+            if (totalChanges < 50) {
+              label = 'size: XS';
+              message = '✨ とても小さなPRです（50行未満）';
+            } else if (totalChanges < 200) {
+              label = 'size: S';
+              message = '👍 小さなPRです（200行未満）';
+            } else if (totalChanges < 500) {
+              label = 'size: M';
+              message = '📦 中程度のPRです（500行未満）';
+            } else if (totalChanges < 1000) {
+              label = 'size: L';
+              message = '⚠️ 大きなPRです（1000行未満）- レビューの負荷を考慮してください';
+              status = 'warning';
+            } else {
+              label = 'size: XL';
+              message = '🚨 とても大きなPRです（1000行以上）- 分割を強く推奨します';
+              status = 'warning';
+            }
+            
+            // ラベルを付与
+            try {
+              // 既存のサイズラベルを削除
+              const existingLabels = await github.rest.issues.listLabelsOnIssue({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number
+              });
+              
+              for (const existingLabel of existingLabels.data) {
+                if (existingLabel.name.startsWith('size: ')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: existingLabel.name
+                  });
+                }
+              }
+              
+              // 新しいラベルを追加
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: [label]
+              });
+            } catch (error) {
+              console.log('Label operation failed:', error.message);
+            }
+            
+            // チェック結果を設定
+            console.log(message);
+            console.log(`Total changes: ${totalChanges}, Files: ${filesChanged}`);
+            
+            // 大きすぎる場合は警告を出す
+            if (status === 'warning') {
+              core.warning(message);
+            }

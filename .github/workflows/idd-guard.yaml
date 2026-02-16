@@ -1,0 +1,33 @@
+name: IDD Guard
+# PRのタイトルやBodyをチェックし、ルール違反ならマージさせない
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  rule-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Linked Issues
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            // GitHubが認識するKeywordが含まれているか (closes #1, fixes #1 etc)
+            const regex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#\d+/i;
+            
+            if (!regex.test(body)) {
+              core.setFailed("⛔ Issueとの紐付けが見つかりません。\nPRの概要に 'Closes #Issue番号' を記述してください。");
+            }
+
+      - name: Check PR Title Format
+        run: |
+          # 従来のコミット規約 (Conventional Commits) をPRタイトルにも求める例
+          # 例: "feat: add login" はOK, "add login" はNG
+          title="${{ github.event.pull_request.title }}"
+          if ! echo "$title" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|chore|ci)(\(.+\))?: .+"; then
+            echo "⛔ PRタイトルの形式が不正です。"
+            echo "期待される形式: type: description (例: feat: ログイン機能追加)"
+            exit 1
+          fi

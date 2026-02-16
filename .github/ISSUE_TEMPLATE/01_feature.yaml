@@ -1,0 +1,18 @@
+name: 🚀 新機能 (Feature)
+description: 実装内容をしっかり定義して開発する場合
+title: "[Feat]: "
+labels: ["Type: Feature"]
+body:
+  - type: textarea
+    attributes:
+      label: 概要
+      description: 何を作るのか、なぜ必要なのか。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 完了条件 (DoD)
+      value: |
+        - [ ] 
+    validations:
+      required: true
