@@ -1,5 +1,3 @@
-# WindowsのGit Bash等でも動くようにnpm経由で実行
-npx @biomejs/biome check --write --no-errors-on-unmatched ./src
-
-# 修正されたファイルをステージングに追加しなおす
-git add .
+# Biome でチェックだけ行う（自動修正はしない、または修正してもaddしない）
+# エラーがあればコミットを中止する
+npx @biomejs/biome check --no-errors-on-unmatched ./src
