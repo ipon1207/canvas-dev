@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useCanvasStore } from "@/features/canvas/stores/useCanvasStore";
+import type { ProjectNodeData } from "@/features/canvas/types/canvas";
 
 export function NodeEditor() {
 	const { nodes, selectedNodeId, selectNode, updateNodeData } =
@@ -57,17 +58,18 @@ export function NodeEditor() {
 					<div className="grid gap-2">
 						<Label htmlFor="status">Status</Label>
 						<Select
-							value={selectedNode.data.status || "todo"}
-							onValueChange={(val: any) =>
-								updateNodeData(selectedNode.id, { status: val })
-							}
+							value={selectedNode.data.status ?? "todo"}
+							onValueChange={(val) => {
+								const status = val as ProjectNodeData["status"];
+								updateNodeData(selectedNode.id, { status });
+							}}
 						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select status" />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="todo">To Do</SelectItem>
-								<SelectItem value="in-progress">In Progress</SelectItem>
+								<SelectItem value="inprogress">In Progress</SelectItem>
 								<SelectItem value="done">Done</SelectItem>
 							</SelectContent>
 						</Select>
