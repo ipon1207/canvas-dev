@@ -8,12 +8,13 @@ import {
 } from "@xyflow/react";
 import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
-import type { AppEdge, AppNode } from "../types/canvas";
+import type { AppEdge, AppNode, ProjectNodeData } from "../types/canvas";
 
 // StateとActionの型定義
 type CanvasState = {
 	nodes: AppNode[];
 	edges: AppEdge[];
+	selectedNodeId: string | null;
 
 	// Actions
 	onNodesChange: (changes: NodeChange[]) => void;
@@ -21,6 +22,8 @@ type CanvasState = {
 	onConnect: (connection: Connection) => void;
 	setNodes: (nodes: AppNode[]) => void;
 	addNode: () => void;
+	selectNode: (id: string | null) => void;
+	updateNodeData: (id: string, data: Partial<ProjectNodeData>) => void;
 };
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -38,6 +41,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 		},
 	],
 	edges: [],
+	selectedNodeId: null,
 
 	// ノードがドラッグ等で変更されたときに呼ばれる
 	onNodesChange: (changes) => {
@@ -80,5 +84,17 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 		};
 
 		set({ nodes: [...get().nodes, newNode] });
+	},
+
+	// 選択状態をセットする
+	selectNode: (id) => set({ selectedNodeId: id }),
+
+	// 指定したIDのノードデータ（label, status等）だけを部分更新する
+	updateNodeData: (id, data) => {
+		set({
+			nodes: get().nodes.map((node) =>
+				node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
+			),
+		});
 	},
 }));
