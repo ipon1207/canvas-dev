@@ -28,7 +28,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 			id: "1",
 			position: { x: 100, y: 100 },
 			data: { label: "Start Learning" },
-			type: "default",
+			type: "app-node",
 		},
 	],
 	edges: [],
