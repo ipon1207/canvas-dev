@@ -1,4 +1,5 @@
 import { Handle, type NodeProps, Position } from "@xyflow/react";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AppNode } from "../../types/canvas";
 
@@ -13,9 +14,18 @@ export function AppNodeComponent({ data, selected }: NodeProps<AppNode>) {
 			<Handle type="target" position={Position.Top} className="bg-zinc-400!" />
 
 			<CardHeader className="p-3 pb-0">
-				<CardTitle className="text-sm font-bold text-zinc-700">
-					{data.label}
-				</CardTitle>
+				<div className="flex items-center font-bold text-zinc-700 truncate">
+					<CardTitle className="text-sm font-bold text-zinc-700">
+						{data.label}
+					</CardTitle>
+
+					{/* ステータスがあればバッジを表示 */}
+					{data.status && (
+						<Badge variant="secondary" className="text-[10px] px-1 py-0 h-5">
+							{data.status}
+						</Badge>
+					)}
+				</div>
 			</CardHeader>
 
 			<CardContent className="p-3 pt-2">
