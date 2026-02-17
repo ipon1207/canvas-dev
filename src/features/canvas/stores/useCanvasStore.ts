@@ -6,6 +6,7 @@ import {
 	type EdgeChange,
 	type NodeChange,
 } from "@xyflow/react";
+import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
 import type { AppEdge, AppNode } from "../types/canvas";
 
@@ -19,6 +20,7 @@ type CanvasState = {
 	onEdgesChange: (changes: EdgeChange[]) => void;
 	onConnect: (connection: Connection) => void;
 	setNodes: (nodes: AppNode[]) => void;
+	addNode: () => void;
 };
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -60,4 +62,23 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
 	// データを丸ごとセットする場合（ロード機能用）
 	setNodes: (nodes) => set({ nodes }),
+
+	// 新しいノードを追加する
+	addNode: () => {
+		const newNode: AppNode = {
+			id: uuidv4(), // ユニークIDを生成
+			type: "app-node", // カスタムノードを指定
+			position: {
+				x: Math.random() * 400,
+				y: Math.random() * 400,
+			},
+			data: {
+				label: "New Task",
+				status: "todo",
+				description: "Click to edit details ...",
+			},
+		};
+
+		set({ nodes: [...get().nodes, newNode] });
+	},
 }));
