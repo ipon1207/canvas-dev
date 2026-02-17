@@ -16,12 +16,14 @@ type CanvasState = {
 	nodes: AppNode[];
 	edges: AppEdge[];
 	selectedNodeId: string | null;
+	currentPath: string | null;
 
 	// Actions
 	onNodesChange: (changes: NodeChange[]) => void;
 	onEdgesChange: (changes: EdgeChange[]) => void;
 	onConnect: (connection: Connection) => void;
 	setNodes: (nodes: AppNode[]) => void;
+	setCurrentPath: (path: string | null) => void;
 	addNode: () => void;
 	selectNode: (id: string | null) => void;
 	updateNodeData: (id: string, data: Partial<ProjectNodeData>) => void;
@@ -45,7 +47,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 	],
 	edges: [],
 	selectedNodeId: null,
-
+	currentPath: null,
 	// ノードがドラッグ等で変更されたときに呼ばれる
 	onNodesChange: (changes) => {
 		set({
@@ -69,6 +71,9 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
 	// データを丸ごとセットする場合（ロード機能用）
 	setNodes: (nodes) => set({ nodes }),
+
+	// 現在のファイルパスをセットする
+	setCurrentPath: (path) => set({ currentPath: path }),
 
 	// 新しいノードを追加する
 	addNode: () => {
