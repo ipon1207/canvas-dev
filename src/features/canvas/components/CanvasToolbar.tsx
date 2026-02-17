@@ -1,6 +1,7 @@
 import { Panel } from "@xyflow/react";
 import { FolderOpen, Plus, Save } from "lucide-react";
 import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +19,27 @@ export function CanvasToolbar() {
 	const executeSave = useCallback(async () => {
 		const data = getProjectData();
 
-		if (currentPath) {
-			await saveProjectToPath(currentPath, data);
-		} else {
-			const newPath = await saveAsProject(data);
-			if (newPath) setCurrentPath(newPath);
+		try {
+			if (currentPath) {
+				const success = await saveProjectToPath(currentPath, data);
+
+				if (success) {
+					toast.success("Project saved successfully!");
+				} else {
+					toast.error("Failed to save project");
+				}
+			} else {
+				const newPath = await saveAsProject(data);
+				if (newPath) {
+					setCurrentPath(newPath);
+					toast.success("Project saved successfully!");
+				} else {
+					// キャンセルされた場合は何もしない
+				}
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error("An unexpected error occurred while saving");
 		}
 	}, [currentPath, getProjectData, setCurrentPath]);
 
