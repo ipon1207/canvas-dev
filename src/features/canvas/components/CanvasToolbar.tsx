@@ -12,7 +12,8 @@ export function CanvasToolbar() {
 				onClick={addNode}
 				className="shadow-lg hover:scale-105 transition-transform"
 			>
-				<Plus className="mr-2 h-4 w-4">Add Node</Plus>
+				<Plus className="mr-2 h-4 w-4" />
+				Add Node
 			</Button>
 		</Panel>
 	);
