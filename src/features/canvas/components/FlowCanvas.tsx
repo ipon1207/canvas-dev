@@ -5,6 +5,11 @@ import {
 	ReactFlow,
 } from "@xyflow/react";
 import { useCanvasStore } from "../stores/useCanvasStore";
+import { AppNodeComponent } from "./nodes/AppNodes";
+
+const nodeTypes = {
+	"app-node": AppNodeComponent,
+};
 
 export function FlowCanvas() {
 	// Storev から必要なデータと関数を取り出す
@@ -19,6 +24,7 @@ export function FlowCanvas() {
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				nodeTypes={nodeTypes}
 				fitView
 			>
 				<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
