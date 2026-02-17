@@ -8,6 +8,7 @@ import {
 } from "@xyflow/react";
 import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
+import type { ProjectData } from "@/features/file-system/schema/project";
 import type { AppEdge, AppNode, ProjectNodeData } from "../types/canvas";
 
 // StateとActionの型定義
@@ -24,6 +25,8 @@ type CanvasState = {
 	addNode: () => void;
 	selectNode: (id: string | null) => void;
 	updateNodeData: (id: string, data: Partial<ProjectNodeData>) => void;
+	loadProject: (data: ProjectData) => void;
+	getProjectData: () => ProjectData;
 };
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -97,4 +100,20 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 			),
 		});
 	},
+
+	// データを丸ごと読み込む
+	loadProject: (data) => {
+		set({
+			nodes: data.nodes,
+			edges: data.edges,
+		});
+	},
+
+	// 保存用に現在のデータをまとめる
+	getProjectData: () => ({
+		version: "1.0.0",
+		timestamp: Date.now(),
+		nodes: get().nodes,
+		edges: get().edges,
+	}),
 }));
