@@ -1,34 +1,58 @@
 import { Panel } from "@xyflow/react";
 import { FolderOpen, Plus, Save } from "lucide-react";
+import { useCallback, useEffect } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
 	loadProjectFromFile,
-	saveProjectToFile,
+	saveAsProject,
+	saveProjectToPath,
 } from "@/features/file-system/api/file";
 import { useCanvasStore } from "../stores/useCanvasStore";
 
 export function CanvasToolbar() {
-	const { addNode, getProjectData, loadProject } = useCanvasStore();
+	const { addNode, getProjectData, loadProject, currentPath, setCurrentPath } =
+		useCanvasStore();
 
-	// 保存ボタンのハンドラ
-	const handleSave = async () => {
+	// 上書き保存ロジック
+	const executeSave = useCallback(async () => {
 		const data = getProjectData();
-		await saveProjectToFile(data);
-	};
+
+		if (currentPath) {
+			await saveProjectToPath(currentPath, data);
+		} else {
+			const newPath = await saveAsProject(data);
+			if (newPath) setCurrentPath(newPath);
+		}
+	}, [currentPath, getProjectData, setCurrentPath]);
 
 	// 読み込みボタンのハンドラ
 	const handleLoad = async () => {
-		const data = await loadProjectFromFile();
-		if (data) {
-			loadProject(data);
+		const result = await loadProjectFromFile();
+		if (result) {
+			loadProject(result.data);
+			setCurrentPath(result.path);
 		}
 	};
+
+	// キーボードショートカット
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Ctrl+S or Cmd+S
+			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+				e.preventDefault();
+				executeSave();
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [executeSave]);
 
 	return (
 		<Panel position="top-right" className="m-4 flex gap-2">
 			<ModeToggle />
-			<Button onClick={handleSave} variant="outline" size="icon" title="Save">
+			<Button onClick={executeSave} variant="outline" size="icon" title="Save">
 				<Save className="h-4 w-4" />
 			</Button>
 
