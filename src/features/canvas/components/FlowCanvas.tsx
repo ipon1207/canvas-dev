@@ -4,6 +4,7 @@ import {
 	Controls,
 	ReactFlow,
 } from "@xyflow/react";
+import { NodeEditor } from "@/features/editor/components/NodeEditor";
 import { useCanvasStore } from "../stores/useCanvasStore";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { AppNodeComponent } from "./nodes/AppNodes";
@@ -13,8 +14,8 @@ const nodeTypes = {
 };
 
 export function FlowCanvas() {
-	// Storev から必要なデータと関数を取り出す
-	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
+	// Store から必要なデータと関数を取り出す
+	const { nodes, edges, onNodesChange, onEdgesChange, onConnect, selectNode } =
 		useCanvasStore();
 
 	return (
@@ -26,12 +27,15 @@ export function FlowCanvas() {
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
 				nodeTypes={nodeTypes}
+				onNodeClick={(_, node) => selectNode(node.id)}
+				onPaneClick={() => selectNode(null)}
 				fitView
 			>
 				<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 				<Controls />
 				<CanvasToolbar />
 			</ReactFlow>
+			<NodeEditor />
 		</div>
 	);
 }
