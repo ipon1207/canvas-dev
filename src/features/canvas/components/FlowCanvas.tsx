@@ -5,6 +5,7 @@ import {
 	ReactFlow,
 } from "@xyflow/react";
 import { useCanvasStore } from "../stores/useCanvasStore";
+import { CanvasToolbar } from "./CanvasToolbar";
 import { AppNodeComponent } from "./nodes/AppNodes";
 
 const nodeTypes = {
@@ -29,6 +30,7 @@ export function FlowCanvas() {
 			>
 				<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 				<Controls />
+				<CanvasToolbar />
 			</ReactFlow>
 		</div>
 	);
