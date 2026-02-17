@@ -14,7 +14,7 @@ const nodeTypes = {
 };
 
 export function FlowCanvas() {
-	// Storev から必要なデータと関数を取り出す
+	// Store から必要なデータと関数を取り出す
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect, selectNode } =
 		useCanvasStore();
 
