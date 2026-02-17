@@ -1,5 +1,6 @@
 import { Panel } from "@xyflow/react";
 import { FolderOpen, Plus, Save } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
 	loadProjectFromFile,
@@ -26,6 +27,7 @@ export function CanvasToolbar() {
 
 	return (
 		<Panel position="top-right" className="m-4 flex gap-2">
+			<ModeToggle />
 			<Button onClick={handleSave} variant="outline" size="icon" title="Save">
 				<Save className="h-4 w-4" />
 			</Button>
