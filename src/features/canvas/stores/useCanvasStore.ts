@@ -19,6 +19,7 @@ type CanvasState = {
 	selectedNodeId: string | null;
 	currentPath: string | null;
 	clipboardNodes: AppNode[];
+	selectedEdgeId: string | null;
 
 	// Actions
 	onNodesChange: (changes: NodeChange[]) => void;
@@ -34,6 +35,8 @@ type CanvasState = {
 	copySelection: () => void;
 	pasteFromClipboard: () => void;
 	addImageNode: (position: { x: number; y: number }, path: string) => void;
+	selectEdge: (id: string | null) => void;
+	updateEdge: (id: string, data: Partial<AppEdge>) => void;
 };
 
 export const useCanvasStore = create<CanvasState>()(
@@ -56,7 +59,7 @@ export const useCanvasStore = create<CanvasState>()(
 			selectedNodeId: null,
 			currentPath: null,
 			clipboardNodes: [],
-
+			selectedEdgeId: null,
 			// ノードがドラッグ等で変更されたときに呼ばれる
 			onNodesChange: (changes) => {
 				set({
@@ -181,6 +184,18 @@ export const useCanvasStore = create<CanvasState>()(
 				};
 				// 既存のノード配列に追加
 				set({ nodes: [...get().nodes, newNode] });
+			},
+
+			// エッジ選択（ノード選択は解除）
+			selectEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
+
+			// エッジ更新
+			updateEdge: (id, changes) => {
+				set({
+					edges: get().edges.map((edge) =>
+						edge.id === id ? { ...edge, ...changes } : edge,
+					),
+				});
 			},
 		}),
 		{

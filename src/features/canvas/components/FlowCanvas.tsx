@@ -8,6 +8,7 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { useEffect } from "react";
+import { EdgeEditor } from "@/features/editor/components/EdgeEditor";
 import { NodeEditor } from "@/features/editor/components/NodeEditor";
 import { useCanvasStore } from "../stores/useCanvasStore";
 import { CanvasToolbar } from "./CanvasToolbar";
@@ -39,6 +40,7 @@ function FlowCanvasInner() {
 		onConnect,
 		selectNode,
 		addImageNode,
+		selectEdge,
 	} = useCanvasStore();
 
 	// 座標変換のためにインスタンスを取得
@@ -81,8 +83,12 @@ function FlowCanvasInner() {
 				onConnect={onConnect}
 				nodeTypes={nodeTypes}
 				onNodeClick={(_, node) => selectNode(node.id)}
-				onPaneClick={() => selectNode(null)}
+				onPaneClick={() => {
+					selectNode(null);
+					selectEdge(null);
+				}}
 				deleteKeyCode={["Backspace", "Delete"]}
+				onEdgeClick={(_, edge) => selectEdge(edge.id)}
 				fitView
 			>
 				<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
@@ -90,6 +96,7 @@ function FlowCanvasInner() {
 				<CanvasToolbar />
 			</ReactFlow>
 			<NodeEditor />
+			<EdgeEditor />
 		</div>
 	);
 }
