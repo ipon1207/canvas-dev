@@ -1,5 +1,5 @@
 import { Panel } from "@xyflow/react";
-import { FolderOpen, Plus, Redo, Save, Undo } from "lucide-react";
+import { ArrowDownAZ, FolderOpen, Plus, Redo, Save, Undo } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -10,6 +10,7 @@ import {
 	saveProjectToPath,
 } from "@/features/file-system/api/file";
 import { useCanvasStore } from "../stores/useCanvasStore";
+import { getLayoutedElements } from "../utils/layout";
 
 export function CanvasToolbar() {
 	const {
@@ -20,6 +21,9 @@ export function CanvasToolbar() {
 		setCurrentPath,
 		copySelection,
 		pasteFromClipboard,
+		nodes,
+		edges,
+		setNodes,
 	} = useCanvasStore();
 
 	const { undo, redo, pastStates, futureStates } =
@@ -65,6 +69,15 @@ export function CanvasToolbar() {
 			setCurrentPath(result.path);
 		}
 	};
+
+	// レイアウト実行
+	const handleAutoLayout = useCallback(() => {
+		const { nodes: layoutedNodes } = getLayoutedElements(nodes, edges, "TB");
+
+		setNodes(layoutedNodes);
+
+		toast.success("Auto-layout applied!");
+	}, [nodes, edges, setNodes]);
 
 	// キーボードショートカット
 	useEffect(() => {
@@ -151,6 +164,17 @@ export function CanvasToolbar() {
 			>
 				<Plus className="mr-2 h-4 w-4" />
 				Add Node
+			</Button>
+
+			<div className="w-px h-6 bg-zinc-300 dark:bg-zinc-700 mx-1" />
+
+			<Button
+				onClick={handleAutoLayout}
+				variant="outline"
+				size="icon"
+				title="Auto Layout"
+			>
+				<ArrowDownAZ className="h-4 w-4" />
 			</Button>
 		</Panel>
 	);
