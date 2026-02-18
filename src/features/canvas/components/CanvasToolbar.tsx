@@ -1,5 +1,13 @@
 import { Panel } from "@xyflow/react";
-import { ArrowDownAZ, FolderOpen, Plus, Redo, Save, Undo } from "lucide-react";
+import {
+	ArrowDownAZ,
+	Download,
+	FolderOpen,
+	Plus,
+	Redo,
+	Save,
+	Undo,
+} from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -10,6 +18,7 @@ import {
 	saveProjectToPath,
 } from "@/features/file-system/api/file";
 import { useCanvasStore } from "../stores/useCanvasStore";
+import { downloadImage } from "../utils/download";
 import { getLayoutedElements } from "../utils/layout";
 
 export function CanvasToolbar() {
@@ -78,6 +87,15 @@ export function CanvasToolbar() {
 
 		toast.success("Auto-layout applied!");
 	}, [nodes, edges, setNodes]);
+
+	const handleExport = useCallback(async () => {
+		const success = await downloadImage(nodes);
+		if (success) {
+			toast.success("Image exported successfully!");
+		} else {
+			toast.error("Failed to export image");
+		}
+	}, [nodes]);
 
 	// キーボードショートカット
 	useEffect(() => {
@@ -175,6 +193,15 @@ export function CanvasToolbar() {
 				title="Auto Layout"
 			>
 				<ArrowDownAZ className="h-4 w-4" />
+			</Button>
+
+			<Button
+				onClick={handleExport}
+				variant="outline"
+				size="icon"
+				title="Export as PNG"
+			>
+				<Download className="h-4 w-4" />
 			</Button>
 		</Panel>
 	);
