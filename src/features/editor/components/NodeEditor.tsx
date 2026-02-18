@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -73,6 +74,21 @@ export function NodeEditor() {
 								<SelectItem value="done">Done</SelectItem>
 							</SelectContent>
 						</Select>
+					</div>
+
+					<div className="grid gap-2">
+						<Label htmlFor="link" className="flex items-center gap-2">
+							<ExternalLink className="h-3 w-3" />
+							Link (URL or Local Path)
+						</Label>
+						<Input
+							id="link"
+							placeholder="https://github.com... or C:/Projects/..."
+							value={selectedNode.data.link ?? ""}
+							onChange={(e) =>
+								updateNodeData(selectedNode.id, { link: e.target.value })
+							}
+						/>
 					</div>
 
 					<div className="grid gap-2">

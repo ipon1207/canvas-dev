@@ -5,6 +5,7 @@ export type ProjectNodeData = {
 	label: string;
 	status?: "todo" | "inprogress" | "done";
 	description?: string;
+	link?: string;
 };
 
 // React Flow のNode型を拡張（現時点ではジェネリック型として運用）
