@@ -122,6 +122,9 @@ export const useCanvasStore = create<CanvasState>()(
 					nodes: data.nodes,
 					edges: data.edges,
 				});
+
+				// ロード直後に履歴をクリアする
+				useCanvasStore.temporal.getState().clear();
 			},
 
 			// 保存用に現在のデータをまとめる
