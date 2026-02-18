@@ -33,6 +33,7 @@ type CanvasState = {
 	getProjectData: () => ProjectData;
 	copySelection: () => void;
 	pasteFromClipboard: () => void;
+	addImageNode: (position: { x: number; y: number }, path: string) => void;
 };
 
 export const useCanvasStore = create<CanvasState>()(
@@ -164,6 +165,22 @@ export const useCanvasStore = create<CanvasState>()(
 				const deserializedNodes = nodes.map((n) => ({ ...n, selected: false }));
 
 				set({ nodes: [...deserializedNodes, ...newNodes] });
+			},
+
+			// 画像ノード追加アクション
+			addImageNode: (position, path) => {
+				const newNode: AppNode = {
+					id: uuidv4(),
+					type: "image-node",
+					position,
+					data: {
+						label: "Image",
+						link: path,
+					},
+					style: { width: 200, height: 150 },
+				};
+				// 既存のノード配列に追加
+				set({ nodes: [...get().nodes, newNode] });
 			},
 		}),
 		{
