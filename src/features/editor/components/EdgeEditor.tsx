@@ -33,7 +33,7 @@ export function EdgeEditor() {
 
 	return (
 		<Sheet open={isOpen} onOpenChange={handleClose}>
-			<SheetContent className="w-100" side="right">
+			<SheetContent className="w-100 sm:w-135" side="right">
 				<SheetHeader>
 					<SheetTitle>Edit Edge</SheetTitle>
 					<SheetDescription>Connection settings</SheetDescription>
