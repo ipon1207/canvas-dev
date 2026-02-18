@@ -11,6 +11,8 @@
 		"fs:default",
 		"fs:allow-read-text-file",
 		"fs:allow-write-text-file",
+		"opener:allow-open-url",
+		"opener:allow-reveal-item-in-dir",
 		{
 			"identifier": "fs:scope",
 			"allow": [
