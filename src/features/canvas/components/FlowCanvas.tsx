@@ -3,6 +3,7 @@ import {
 	Background,
 	BackgroundVariant,
 	Controls,
+	MiniMap,
 	ReactFlow,
 	ReactFlowProvider,
 	useReactFlow,
@@ -92,6 +93,14 @@ function FlowCanvasInner() {
 				fitView
 			>
 				<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+				<MiniMap
+					nodeColor={(n) => {
+						if (n.type === "image-node") return "#3b82f6";
+						return "#e2e8f0";
+					}}
+					position="bottom-left"
+					className="bg-white! dark:bg-zinc-900! dark:border-zinc-800"
+				/>
 				<Controls />
 				<CanvasToolbar />
 			</ReactFlow>
