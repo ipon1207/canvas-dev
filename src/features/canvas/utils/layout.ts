@@ -27,8 +27,14 @@ export const getLayoutedElements = (
 
 	// ノードを登録（React Flow が実測したサイズがあればそれを使う）
 	nodes.forEach((node) => {
-		const width = node.measured?.width ?? DEFAULT_NODE_WIDTH;
-		const height = node.measured?.height ?? DEFAULT_NODE_HEIGHT;
+		const width =
+			node.measured?.width ??
+			(typeof node.style?.width === "number" ? node.style.width : null) ??
+			DEFAULT_NODE_WIDTH;
+		const height =
+			node.measured?.height ??
+			(typeof node.style?.height === "number" ? node.style.height : null) ??
+			DEFAULT_NODE_HEIGHT;
 		dagreGraph.setNode(node.id, { width, height });
 	});
 
@@ -43,8 +49,14 @@ export const getLayoutedElements = (
 	// 計算結果をノードの position に反映
 	const layoutedNodes = nodes.map((node) => {
 		const nodeWithPosition = dagreGraph.node(node.id);
-		const width = node.measured?.width ?? DEFAULT_NODE_WIDTH;
-		const height = node.measured?.height ?? DEFAULT_NODE_HEIGHT;
+		const width =
+			node.measured?.width ??
+			(typeof node.style?.width === "number" ? node.style.width : null) ??
+			DEFAULT_NODE_WIDTH;
+		const height =
+			node.measured?.height ??
+			(typeof node.style?.height === "number" ? node.style.height : null) ??
+			DEFAULT_NODE_HEIGHT;
 
 		return {
 			...node,
