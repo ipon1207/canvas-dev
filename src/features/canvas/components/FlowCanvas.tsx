@@ -8,10 +8,8 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { NodeEditor } from "@/features/editor/components/NodeEditor";
 import { useCanvasStore } from "../stores/useCanvasStore";
-import type { AppNode } from "../types/canvas";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { AppNodeComponent } from "./nodes/AppNodes";
 import { ImageNode } from "./nodes/ImageNode";
@@ -33,8 +31,15 @@ export function FlowCanvas() {
 
 function FlowCanvasInner() {
 	// Store から必要なデータと関数を取り出す
-	const { nodes, edges, onNodesChange, onEdgesChange, onConnect, selectNode } =
-		useCanvasStore();
+	const {
+		nodes,
+		edges,
+		onNodesChange,
+		onEdgesChange,
+		onConnect,
+		selectNode,
+		addImageNode,
+	} = useCanvasStore();
 
 	// 座標変換のためにインスタンスを取得
 	const { screenToFlowPosition } = useReactFlow();
@@ -56,20 +61,7 @@ function FlowCanvasInner() {
 						y: position.y,
 					});
 
-					const newNode: AppNode = {
-						id: uuidv4(),
-						type: "image-node",
-						position: flowPosition,
-						data: {
-							label: "Image",
-							link: filePath,
-						},
-						style: { width: 200, height: 150 },
-					};
-
-					useCanvasStore.setState((state) => ({
-						nodes: [...state.nodes, newNode],
-					}));
+					addImageNode(flowPosition, filePath);
 				}
 			}
 		});
@@ -77,7 +69,7 @@ function FlowCanvasInner() {
 		return () => {
 			unlisten.then((fn) => fn());
 		};
-	}, [screenToFlowPosition]);
+	}, [screenToFlowPosition, addImageNode]);
 
 	return (
 		<div style={{ width: "100%", height: "100%" }}>
