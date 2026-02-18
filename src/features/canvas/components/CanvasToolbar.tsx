@@ -74,7 +74,7 @@ export function CanvasToolbar() {
 	const handleAutoLayout = useCallback(() => {
 		const { nodes: layoutedNodes } = getLayoutedElements(nodes, edges, "TB");
 
-		setNodes([...layoutedNodes]);
+		setNodes(layoutedNodes);
 
 		toast.success("Auto-layout applied!");
 	}, [nodes, edges, setNodes]);
