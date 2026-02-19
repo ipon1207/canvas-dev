@@ -1,4 +1,4 @@
-import { type NodeProps, NodeResizer } from "@xyflow/react";
+import { Handle, type NodeProps, NodeResizer, Position } from "@xyflow/react";
 import { memo } from "react";
 import type { AppNode } from "../../types/canvas";
 
@@ -15,10 +15,18 @@ export const GroupNode = memo(({ data, selected }: NodeProps<AppNode>) => {
 				minHeight={200}
 			/>
 
+			<Handle type="target" position={Position.Top} className="bg-zinc-400!" />
+
 			{/* グループのタイトル（背景に薄く表示） */}
 			<div className="font-bold text-blue-800 dark:text-blue-300 text-xl opacity-40 select-none pointer-events-none">
 				{data.label || "Group"}
 			</div>
+
+			<Handle
+				type="source"
+				position={Position.Bottom}
+				className="bg-zinc-400!"
+			/>
 		</div>
 	);
 });
