@@ -6,6 +6,7 @@ import {
 	type EdgeChange,
 	type NodeChange,
 } from "@xyflow/react";
+import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { temporal } from "zundo";
 import { create } from "zustand";
@@ -38,6 +39,19 @@ function sortNodesParentFirst(nodes: AppNode[]): AppNode[] {
 			) {
 				sorted.push(node);
 				addedIds.add(node.id);
+			}
+		}
+	}
+
+	// 循環参照などにより追加されなかったノード拾い上げる
+	if (sorted.length < nodes.length) {
+		console.error(
+			"Circular reference or missing parent detected during node sorting. Remaining nodes will be appended",
+		);
+		for (const node of remaining) {
+			if (!addedIds.has(node.id)) {
+				// 親子関係を維持したまま強制的に末尾に追加
+				sorted.push(node);
 			}
 		}
 	}
@@ -159,6 +173,23 @@ export const useCanvasStore = create<CanvasState>()(
 			// ノードの親（グループ）を変更する
 			updateNodeParent: (id, newParentId) => {
 				const { nodes } = get();
+
+				// 循環参照のチェック（親チェーンを辿って自分自身に到達しないか確認）
+				if (newParentId) {
+					let currentId: string | undefined = newParentId;
+					while (currentId) {
+						if (currentId === id) {
+							console.error(
+								`Circular reference detected: Cannot set ${newParentId} as parent of ${id}`,
+							);
+							toast.error("Cannot create circular group reference");
+							return;
+						}
+						const currentNode = nodes.find((n) => n.id === currentId);
+						currentId = currentNode?.parentId;
+					}
+				}
+
 				const targetNode = nodes.find((n) => n.id === id);
 				if (!targetNode) return;
 
