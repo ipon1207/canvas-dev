@@ -6,11 +6,58 @@ import {
 	type EdgeChange,
 	type NodeChange,
 } from "@xyflow/react";
+import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import type { ProjectData } from "@/features/file-system/schema/project";
 import type { AppEdge, AppNode, ProjectNodeData } from "../types/canvas";
+
+// 親ノードが子ノードより前に来るようにソートする
+function sortNodesParentFirst(nodes: AppNode[]): AppNode[] {
+	const sorted: AppNode[] = [];
+	const remaining = [...nodes];
+	const addedIds = new Set<string>();
+
+	// まず親を持たないノードを追加
+	for (const node of remaining) {
+		if (!node.parentId) {
+			sorted.push(node);
+			addedIds.add(node.id);
+		}
+	}
+
+	// 残りのノードを親が追加済みになるまで繰り返し追加
+	let prevLength = -1;
+	while (sorted.length < nodes.length && sorted.length !== prevLength) {
+		prevLength = sorted.length;
+		for (const node of remaining) {
+			if (
+				!addedIds.has(node.id) &&
+				node.parentId &&
+				addedIds.has(node.parentId)
+			) {
+				sorted.push(node);
+				addedIds.add(node.id);
+			}
+		}
+	}
+
+	// 循環参照などにより追加されなかったノード拾い上げる
+	if (sorted.length < nodes.length) {
+		console.error(
+			"Circular reference or missing parent detected during node sorting. Remaining nodes will be appended",
+		);
+		for (const node of remaining) {
+			if (!addedIds.has(node.id)) {
+				// 親子関係を維持したまま強制的に末尾に追加
+				sorted.push(node);
+			}
+		}
+	}
+
+	return sorted;
+}
 
 // StateとActionの型定義
 type CanvasState = {
@@ -30,6 +77,7 @@ type CanvasState = {
 	addNode: () => void;
 	selectNode: (id: string | null) => void;
 	updateNodeData: (id: string, data: Partial<ProjectNodeData>) => void;
+	updateNodeParent: (id: string, parentId: string | undefined) => void;
 	loadProject: (data: ProjectData) => void;
 	getProjectData: () => ProjectData;
 	copySelection: () => void;
@@ -38,6 +86,7 @@ type CanvasState = {
 	selectEdge: (id: string | null) => void;
 	updateEdge: (id: string, data: Partial<AppEdge>) => void;
 	addMarkdownNode: () => void;
+	addGroupNode: () => void;
 };
 
 export const useCanvasStore = create<CanvasState>()(
@@ -121,10 +170,92 @@ export const useCanvasStore = create<CanvasState>()(
 				});
 			},
 
+			// ノードの親（グループ）を変更する
+			updateNodeParent: (id, newParentId) => {
+				const { nodes } = get();
+
+				// 循環参照のチェック（親チェーンを辿って自分自身に到達しないか確認）
+				if (newParentId) {
+					let currentId: string | undefined = newParentId;
+					while (currentId) {
+						if (currentId === id) {
+							console.error(
+								`Circular reference detected: Cannot set ${newParentId} as parent of ${id}`,
+							);
+							toast.error("Cannot create circular group reference");
+							return;
+						}
+						const currentNode = nodes.find((n) => n.id === currentId);
+						currentId = currentNode?.parentId;
+					}
+				}
+
+				const targetNode = nodes.find((n) => n.id === id);
+				if (!targetNode) return;
+
+				const oldParentId = targetNode.parentId;
+
+				// 位置の変換: 絶対座標 <-> 親からの相対座標
+				let newPosition = { ...targetNode.position };
+
+				if (oldParentId && !newParentId) {
+					// グループから外す: 相対座標 → 絶対座標
+					const oldParent = nodes.find((n) => n.id === oldParentId);
+					if (oldParent) {
+						newPosition = {
+							x: targetNode.position.x + oldParent.position.x,
+							y: targetNode.position.y + oldParent.position.y,
+						};
+					}
+				} else if (!oldParentId && newParentId) {
+					// グループに入れる: 絶対座標 → 相対座標
+					const newParent = nodes.find((n) => n.id === newParentId);
+					if (newParent) {
+						newPosition = {
+							x: targetNode.position.x - newParent.position.x,
+							y: targetNode.position.y - newParent.position.y,
+						};
+					}
+				} else if (oldParentId && newParentId && oldParentId !== newParentId) {
+					// グループ間の移動: 旧親の相対 → 絶対 → 新親の相対
+					const oldParent = nodes.find((n) => n.id === oldParentId);
+					const newParent = nodes.find((n) => n.id === newParentId);
+					if (oldParent && newParent) {
+						newPosition = {
+							x:
+								targetNode.position.x +
+								oldParent.position.x -
+								newParent.position.x,
+							y:
+								targetNode.position.y +
+								oldParent.position.y -
+								newParent.position.y,
+						};
+					}
+				}
+
+				// ノードを更新
+				let updatedNodes = nodes.map((node) =>
+					node.id === id
+						? {
+								...node,
+								parentId: newParentId,
+								extent: newParentId ? ("parent" as const) : undefined,
+								position: newPosition,
+							}
+						: node,
+				);
+
+				// 親ノードが子ノードより前に来るようにソート
+				updatedNodes = sortNodesParentFirst(updatedNodes);
+
+				set({ nodes: updatedNodes });
+			},
+
 			// データを丸ごと読み込む
 			loadProject: (data) => {
 				set({
-					nodes: data.nodes,
+					nodes: sortNodesParentFirst(data.nodes as AppNode[]),
 					edges: data.edges,
 				});
 
@@ -212,6 +343,19 @@ export const useCanvasStore = create<CanvasState>()(
 						label: "Markdown Note",
 						description: "# Idea\n- Point1\n- Point 2",
 					},
+				};
+				set({ nodes: [...get().nodes, newNode] });
+			},
+
+			// グループノード追加
+			addGroupNode: () => {
+				const newNode: AppNode = {
+					id: uuidv4(),
+					type: "group-node",
+					position: { x: 50, y: 50 },
+					data: { label: "New Group" },
+					style: { width: 400, height: 300 },
+					zIndex: -1, // 背景に配置
 				};
 				set({ nodes: [...get().nodes, newNode] });
 			},

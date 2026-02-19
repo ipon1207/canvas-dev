@@ -20,8 +20,18 @@ import { useCanvasStore } from "@/features/canvas/stores/useCanvasStore";
 import type { ProjectNodeData } from "@/features/canvas/types/canvas";
 
 export function NodeEditor() {
-	const { nodes, selectedNodeId, selectNode, updateNodeData } =
-		useCanvasStore();
+	const {
+		nodes,
+		selectedNodeId,
+		selectNode,
+		updateNodeData,
+		updateNodeParent,
+	} = useCanvasStore();
+
+	// 現在キャンバスにあるグループノードの一覧を取得
+	const groupNodes = nodes.filter(
+		(n) => n.type === "group-node" && n.id !== selectedNodeId,
+	);
 
 	// 選択中のノードを探す
 	const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -36,6 +46,12 @@ export function NodeEditor() {
 
 	if (!selectedNode) return null;
 
+	// 親ノードを変更する処理
+	const handleParentChange = (parentId: string) => {
+		const newParentId = parentId === "none" ? undefined : parentId;
+		updateNodeParent(selectedNode.id, newParentId);
+	};
+
 	return (
 		<Sheet open={isOpen} onOpenChange={handleClose}>
 			<SheetContent className="w-100 sm:w-135" side="right">
@@ -45,6 +61,28 @@ export function NodeEditor() {
 				</SheetHeader>
 
 				<div className="grid gap-6 py-4">
+					{/* グループ選択プルダウン（グループ自身には表示しない） */}
+					{groupNodes.length > 0 && (
+						<div className="grid gap-2">
+							<Label>Group (Parent Node)</Label>
+							<Select
+								value={selectedNode.parentId || "none"}
+								onValueChange={handleParentChange}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select a group" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="none">No Group</SelectItem>
+									{groupNodes.map((group) => (
+										<SelectItem key={group.id} value={group.id}>
+											{group.data.label || "Unnamed Group"}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+					)}
 					<div className="grid gap-2">
 						<Label htmlFor="title">Title</Label>
 						<Input

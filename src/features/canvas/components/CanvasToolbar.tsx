@@ -1,6 +1,7 @@
 import { Panel } from "@xyflow/react";
 import {
 	ArrowDownAZ,
+	BoxSelect,
 	Download,
 	FileText,
 	FolderOpen,
@@ -35,6 +36,7 @@ export function CanvasToolbar() {
 		edges,
 		setNodes,
 		addMarkdownNode,
+		addGroupNode,
 	} = useCanvasStore();
 
 	const { undo, redo, pastStates, futureStates } =
@@ -192,6 +194,14 @@ export function CanvasToolbar() {
 				className="shadow-lg hover:scale-105 transition-transform bg-amber-100 text-amber-900 hover:bg-amber-200 dark:bg-amber-900 dark:text-amber-100"
 			>
 				<FileText className="mr-2 h-4 w-4" />
+			</Button>
+
+			<Button
+				onClick={addGroupNode}
+				variant="secondary"
+				className="shadow-lg hover:scale-105 transition-transform bg-blue-100 text-blue-900 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100"
+			>
+				<BoxSelect className="mr-2 h-4 w-4" />
 			</Button>
 
 			<div className="w-px h-6 bg-zinc-300 dark:bg-zinc-700 mx-1" />
