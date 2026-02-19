@@ -29,7 +29,9 @@ export function NodeEditor() {
 	} = useCanvasStore();
 
 	// 現在キャンバスにあるグループノードの一覧を取得
-	const groupNodes = nodes.filter((n) => n.type === "group-node");
+	const groupNodes = nodes.filter(
+		(n) => n.type === "group-node" && n.id !== selectedNodeId,
+	);
 
 	// 選択中のノードを探す
 	const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -60,7 +62,7 @@ export function NodeEditor() {
 
 				<div className="grid gap-6 py-4">
 					{/* グループ選択プルダウン（グループ自身には表示しない） */}
-					{selectedNode.type !== "group-node" && groupNodes.length > 0 && (
+					{groupNodes.length > 0 && (
 						<div className="grid gap-2">
 							<Label>Group (Parent Node)</Label>
 							<Select
