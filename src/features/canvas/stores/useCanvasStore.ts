@@ -37,6 +37,7 @@ type CanvasState = {
 	addImageNode: (position: { x: number; y: number }, path: string) => void;
 	selectEdge: (id: string | null) => void;
 	updateEdge: (id: string, data: Partial<AppEdge>) => void;
+	addMarkdownNode: () => void;
 };
 
 export const useCanvasStore = create<CanvasState>()(
@@ -196,6 +197,23 @@ export const useCanvasStore = create<CanvasState>()(
 						edge.id === id ? { ...edge, ...changes } : edge,
 					),
 				});
+			},
+
+			// Markdownノード追加
+			addMarkdownNode: () => {
+				const newNode: AppNode = {
+					id: uuidv4(),
+					type: "markdown-node",
+					position: {
+						x: Math.random() * 200 + 100,
+						y: Math.random() * 200 + 100,
+					},
+					data: {
+						label: "Markdown Note",
+						description: "# Idea\n- Point1\n- Point 2",
+					},
+				};
+				set({ nodes: [...get().nodes, newNode] });
 			},
 		}),
 		{

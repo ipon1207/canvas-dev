@@ -15,12 +15,14 @@ import { useCanvasStore } from "../stores/useCanvasStore";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { AppNodeComponent } from "./nodes/AppNodes";
 import { ImageNode } from "./nodes/ImageNode";
+import { MarkdownNode } from "./nodes/MarkdownNode";
 
 const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"];
 
 const nodeTypes = {
 	"app-node": AppNodeComponent,
 	"image-node": ImageNode,
+	"markdown-node": MarkdownNode,
 };
 
 export function FlowCanvas() {
