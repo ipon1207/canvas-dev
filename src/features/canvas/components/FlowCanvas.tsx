@@ -14,6 +14,7 @@ import { NodeEditor } from "@/features/editor/components/NodeEditor";
 import { useCanvasStore } from "../stores/useCanvasStore";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { AppNodeComponent } from "./nodes/AppNodes";
+import { GroupNode } from "./nodes/GroupNode";
 import { ImageNode } from "./nodes/ImageNode";
 import { MarkdownNode } from "./nodes/MarkdownNode";
 
@@ -23,6 +24,7 @@ const nodeTypes = {
 	"app-node": AppNodeComponent,
 	"image-node": ImageNode,
 	"markdown-node": MarkdownNode,
+	"group-node": GroupNode,
 };
 
 export function FlowCanvas() {
