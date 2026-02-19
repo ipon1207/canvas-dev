@@ -210,7 +210,7 @@ export const useCanvasStore = create<CanvasState>()(
 					},
 					data: {
 						label: "Markdown Note",
-						description: "# Idea\n- Point1\n-Point 2",
+						description: "# Idea\n- Point1\n- Point 2",
 					},
 				};
 				set({ nodes: [...get().nodes, newNode] });
