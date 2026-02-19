@@ -22,6 +22,7 @@ import {
 import { useCanvasStore } from "../stores/useCanvasStore";
 import { downloadImage } from "../utils/download";
 import { getLayoutedElements } from "../utils/layout";
+import { CanvasSearch } from "./CanvasSearch";
 
 export function CanvasToolbar() {
 	const {
@@ -149,6 +150,7 @@ export function CanvasToolbar() {
 
 	return (
 		<Panel position="top-right" className="m-4 flex gap-2">
+			<CanvasSearch />
 			{/* Undo/Redo Buttons */}
 			<div className="flex gap-1 mr-2 border-r pr-2 border-zinc-200 dark:border-zinc-700">
 				<Button
