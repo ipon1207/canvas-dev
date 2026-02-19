@@ -157,7 +157,14 @@ export const useCanvasStore = create<CanvasState>()(
 			},
 
 			// 選択状態をセットする
-			selectNode: (id) => set({ selectedNodeId: id }),
+			selectNode: (id) =>
+				set({
+					selectedNodeId: id,
+					nodes: get().nodes.map((node) => ({
+						...node,
+						selected: node.id === id,
+					})),
+				}),
 
 			// 指定したIDのノードデータ（label, status等）だけを部分更新する
 			updateNodeData: (id, data) => {
@@ -319,7 +326,19 @@ export const useCanvasStore = create<CanvasState>()(
 			},
 
 			// エッジ選択（ノード選択は解除）
-			selectEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
+			selectEdge: (id) =>
+				set({
+					selectedEdgeId: id,
+					selectedNodeId: null,
+					edges: get().edges.map((edge) => ({
+						...edge,
+						selected: edge.id === id,
+					})),
+					nodes: get().nodes.map((node) => ({
+						...node,
+						selected: false,
+					})),
+				}),
 
 			// エッジ更新
 			updateEdge: (id, changes) => {
